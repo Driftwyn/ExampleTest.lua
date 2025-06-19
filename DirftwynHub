@@ -230,6 +230,18 @@ function DriftwynLib:CreateWindow(config)
                 Instance.new("UICorner", tb)
                 if o.Callback then tb.FocusLost:Connect(function() o.Callback(tb.Text) end) end
             end
+
+            function section:AddLabel(o)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Text = o.Text or "Label"
+    label.Font = o.Font or Enum.Font.Gotham
+    label.TextSize = o.TextSize or 14
+    label.TextWrapped = true
+    label.TextColor3 = o.TextColor or Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Parent = frame
+end
     
             function section:AddKeybind(o)
                 local key = o.Default or Enum.KeyCode.F
