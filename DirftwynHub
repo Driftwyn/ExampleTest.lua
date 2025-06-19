@@ -114,6 +114,7 @@ function DriftwynLib:CreateWindow(config)
     TabButtonsFrame.CanvasSize = UDim2.new(0, 0, 5, 0)
     TabButtonsFrame.ScrollBarThickness = 4
     TabButtonsFrame.Parent = MainFrame
+    Instance.new("UIListLayout", TabButtonsFrame)
     
     local ContentFrame = Instance.new("Frame")
     ContentFrame.Name = "ContentFrame"
