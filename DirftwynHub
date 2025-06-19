@@ -397,4 +397,47 @@ return tab
     return self
 end -- end CreateWindow
 
+function DriftwynLib:ShowProgress(duration, text)
+    local player = Players.LocalPlayer
+    local playerGui = player:WaitForChild("PlayerGui")
+
+    local screen = Instance.new("ScreenGui", playerGui)
+    screen.Name = "ProgressBarGui"
+    screen.ResetOnSpawn = false
+
+    local barBackground = Instance.new("Frame", screen)
+    barBackground.Size = UDim2.new(0, 300, 0, 30)
+    barBackground.Position = UDim2.new(0.5, -150, 0.85, 0)
+    barBackground.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
+    barBackground.BorderSizePixel = 0
+    Instance.new("UICorner", barBackground).CornerRadius = UDim.new(0, 6)
+
+    local barFill = Instance.new("Frame", barBackground)
+    barFill.BackgroundColor3 = Color3.fromRGB(120, 100, 255)
+    barFill.BorderSizePixel = 0
+    barFill.Size = UDim2.new(0, 0, 1, 0)
+    Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 6)
+
+    local label = Instance.new("TextLabel", barBackground)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextSize = 14
+    label.Font = Enum.Font.Gotham
+    label.Text = text or "Loading..."
+
+    -- Run progress
+    task.spawn(function()
+        for i = 1, duration do
+            local pct = i / duration
+            local blocks = math.floor(pct * 20)
+            local barString = "[" .. string.rep("█", blocks) .. string.rep(" ", 20 - blocks) .. "] " .. i .. "/" .. duration .. " seconds"
+            print(barString)
+            barFill:TweenSize(UDim2.new(pct, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quad, 0.3, true)
+            wait(1)
+        end
+        screen:Destroy()
+    end)
+end
+
 return DriftwynLib
