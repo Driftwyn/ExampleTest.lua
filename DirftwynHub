@@ -259,46 +259,67 @@ function DriftwynLib:CreateWindow(config)
                 end)
             end
     
-            function section:AddSlider(o)
-                local lbl = Instance.new("TextLabel")
-                lbl.Size = UDim2.new(1,-20,0,20)
-                lbl.Text = o.Name..": "..(o.Default or o.Min or 0)
-                lbl.Font = Enum.Font.Gotham
-                lbl.TextSize = 14
-                lbl.TextColor3 = Color3.fromRGB(255,255,255)
-                lbl.BackgroundTransparency = 1
-                lbl.Parent = frame
-    
-                local bg = Instance.new("Frame")
-                bg.Size = UDim2.new(1,-20,0,8)
-                bg.BackgroundColor3 = Color3.fromRGB(60,60,85)
-                bg.Parent = frame
-                Instance.new("UICorner", bg)
-    
-                local fill = Instance.new("Frame")
-                fill.Size = UDim2.new(0,0,1,0)
-                fill.BackgroundColor3 = Color3.fromRGB(150,100,255)
-                fill.Parent = bg
-                Instance.new("UICorner", fill)
-    
-                local draggingS = false
-                bg.InputBegan:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingS = true end end)
-                UserInputService.InputEnded:Connect(function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingS = false end end)
-    
-                UserInputService.InputChanged:Connect(function(i)
-                    if draggingS and i.UserInputType == Enum.UserInputType.MouseMovement then
-                        local rel = i.Position.X - bg.AbsolutePosition.X
-                        local pct = math.clamp(rel/bg.AbsoluteSize.X, 0, 1)
-                        fill.Size = UDim2.new(pct,0,1,0)
-                        local val = math.floor(((o.Min or 0) + ((o.Max or 1) - (o.Min or 0)) * pct))
-                        lbl.Text = o.Name..": "..val
-                        if o.Callback then o.Callback(val) end
-                    end
-                end)
-    
-                local defaultPct = ((o.Default or o.Min or 0) - (o.Min or 0))/((o.Max or 1) - (o.Min or 0))
-                fill.Size = UDim2.new(defaultPct,0,1,0)
-            end
+            function section:AddSlider(cfg)
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -20, 0, 20)
+    label.Text = cfg.Name .. ": " .. tostring(cfg.Default or 0)
+    label.Font = Enum.Font.Gotham
+    label.TextSize = 14
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Parent = frame -- ✅ Correct parent
+
+    local sliderBg = Instance.new("Frame")
+    sliderBg.Size = UDim2.new(1, -20, 0, 8)
+    sliderBg.BackgroundColor3 = Color3.fromRGB(60, 60, 85)
+    sliderBg.Parent = frame -- ✅ Correct parent
+    sliderBg.BorderSizePixel = 0
+    Instance.new("UICorner", sliderBg)
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new(0, 0, 1, 0)
+    fill.BackgroundColor3 = Color3.fromRGB(150, 100, 255)
+    fill.BorderSizePixel = 0
+    fill.Parent = sliderBg
+    Instance.new("UICorner", fill)
+
+    local dragging = false
+
+    local function updateSlider(input)
+        local rel = input.Position.X - sliderBg.AbsolutePosition.X
+        local pct = math.clamp(rel / sliderBg.AbsoluteSize.X, 0, 1)
+        fill.Size = UDim2.new(pct, 0, 1, 0)
+        local value = math.floor((cfg.Min or 0) + ((cfg.Max or 100) - (cfg.Min or 0)) * pct)
+        label.Text = cfg.Name .. ": " .. tostring(value)
+        if cfg.Callback then cfg.Callback(value) end
+    end
+
+    sliderBg.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            updateSlider(input)
+        end
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = false
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+            updateSlider(input)
+        end
+    end)
+
+    -- Set default
+    local default = cfg.Default or 0
+    local min = cfg.Min or 0
+    local max = cfg.Max or 100
+    local defaultPct = (default - min) / (max - min)
+    fill.Size = UDim2.new(defaultPct, 0, 1, 0)
+end
     
             function section:AddDropdown(o)
                 local state = false
