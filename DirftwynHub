@@ -369,8 +369,14 @@ end
         end -- end AddSection
     
         self.Tabs[#self.Tabs+1] = tab
-        self.AddTab = self.AddTab
-        return tab
+
+-- Auto set the first tab as default
+if #self.Tabs == 1 then
+    self:SetActiveTab(tab.Name)
+end
+
+return tab
+
     end -- end Create Tab
     
     self.SetActiveTab = self.SetActiveTab
