@@ -102,7 +102,7 @@ function DriftwynLib:CreateWindow(config)
     Title.TextSize = 18
     Title.TextColor3 = Color3.fromRGB(255, 255, 255)
     Title.BackgroundTransparency = 1
-    Title.Position = UDim2.new(0.03, 0, 0, 0)
+    Title.Position = UDim2.new(0.013, 0, 0.017, 0)
     Title.Size = UDim2.new(0.6, 0, 0, 40)
     Title.Parent = MainFrame
     
